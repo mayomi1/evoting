@@ -1,2 +1,2 @@
 # evoting
-This is an evoting application, project is yet under development
+This is an evoting application built with Nodejs, project is yet under development
