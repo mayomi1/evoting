@@ -4,8 +4,10 @@
 'use strict';
 const Election = require('../models/election');
 const Candidate = require('../models/candidate');
+const Invite = require('../models/invite');
+
 //add an election
-exports.addElection = (req, res, next)=> {
+exports.addElection = (req, res)=> {
     //if there user is not login
     if (!req.user) {
         return res.json({error: 'You are not authorized to view this user profile.'});
@@ -31,7 +33,7 @@ exports.addElection = (req, res, next)=> {
 
 
 //edit an election
-exports.editElection = (req, res, next) => {
+exports.editElection = (req, res) => {
     //if there user is not login
     if (!req.user) {
         return res.json({error: 'You are not authorized to view this user profile.'});
@@ -57,7 +59,7 @@ exports.editElection = (req, res, next) => {
     });
 };
 //remove an election
-exports.deleteElection = (req, res, next)=> {
+exports.deleteElection = (req, res)=> {
     let election = req.params.electionId;
     if (!election) {
         return res.json({error: true, msg: "sorry an Id is required"})
@@ -98,7 +100,7 @@ exports.getElection = (req, res)=> {
 };
 
 //route for a single election
-exports.getOneElection = (req, res, next)=>{
+exports.getOneElection = (req, res)=>{
     let electionId = req.params.electionId;
     let userId = req.user._id;
 
@@ -174,7 +176,7 @@ exports.editCandidate  =  function (req, res) {
 exports.removeCandidate = (req, res)=>{
     let candidateId = req.params.candidateId;
 
-    Candidate.findOneAndRemove(candidateId, (err, cand)=>{
+    Candidate.findOneAndRemove(candidateId, (err)=>{
         if(err){
             return res.json({error: true, msg: "An error has occurred , please try again"});
         }
@@ -206,9 +208,67 @@ exports.getOneCandidate = function(req, res) {
     });
 
 };
+//send an invite to people who are to vote
+// add one invitation per person
+exports.sendOneInvite = (req, res)=>{
+    let  electionId = req.params.electionId;
 
+    let voterName = req.body.voterName,
+        voterEmail = req.body.voterEmail,
+        voterPhoneNumber = req.body.phoneNumber;
 
+    var oneVoter = new Invite({
+        electionId: electionId,
+        voterName: voterName,
+        voterEmail: voterEmail,
+        voterPhoneNumber: voterPhoneNumber
+    });
 
+    oneVoter.save(function (err, voter) {
+        if(err){
+            return res.json({error: true, msg: "An error has occurred , please try again"});
+        }
+        return res.json(voter);
+    });
 
-//todo send an invite to people who are to vote
+};
+
+//edit a voter
+exports.editVoter = (req, res)=>{
+    let voterId = req.params.voterId;
+
+    findById(voterId, (err, val)=>{
+        if(err){
+            return res.json({error: true, msg: "An error has occurred , please try again"});
+        }
+        val.voterName = req.body.voterName || val.voterName;
+        val.voterEmail =req.body.voterEmail || val.voterEmail;
+        val.voterPhoneNumber = req.body.voterPhoneNumber || val.voterPhoneNumber;
+
+        val.save((err, voter)=>{
+            if(err){
+                return res.json({error: true, msg: "An error has occurred , please try again"});
+            }
+
+            return res.json(voter);
+        })
+
+    });
+};
+
+//delete a voter
+exports.delete = (req, res)=>{
+    let voterId = req.params.voteId;
+
+    findOneAndRemove(voterId, (err)=>{
+        if(err){
+            return res.json({error: true, msg: "An error has occurred , please try again"});
+        }
+        return res.json('Successfully deleted');
+
+    })
+};
+
+//todo vote
+
 //todo counting of vote
