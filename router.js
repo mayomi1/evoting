@@ -93,6 +93,20 @@ module.exports = function (app) {
     electionRoutes.get('/cand/:candidateId', requireAuth, ElectionController.getOneCandidate);
 
 
+    //To add a voter
+    // ==>> /api/election/addvoter/:eleectionId
+    electionRoutes.post('/addvoter/:electionId', requireAuth, ElectionController.sendOneInvite);
+
+    //To edit a voter
+    // ==>> /api/election/:eleectionId/:voterId
+    electionRoutes.patch('/:electionId/:voterId', requireAuth, ElectionController.editVoter);
+
+    //To delete a voter
+    // ==>> /api/election/:eleectionId
+    electionRoutes.delete('/:electionId', requireAuth, ElectionController.sendOneInvite);
+
+
+
     // Set url for API group routes
     app.use('/api', apiRoutes);
 };

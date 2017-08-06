@@ -23,6 +23,17 @@ const ElectionSchema = new Schema({
         userId:{
             type: String,
             required: true
+        },
+        date: {
+            type: String
+        },
+        time: {
+            startTime:{
+                type: String
+            },
+            stopTime:{
+                type: String
+            }
         }
     },
     {

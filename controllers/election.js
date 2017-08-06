@@ -4,7 +4,7 @@
 'use strict';
 const Election = require('../models/election');
 const Candidate = require('../models/candidate');
-const Invite = require('../models/invite');
+const Voter = require('../models/voter');
 
 //add an election
 exports.addElection = (req, res)=> {
@@ -217,16 +217,31 @@ exports.sendOneInvite = (req, res)=>{
         voterEmail = req.body.voterEmail,
         voterPhoneNumber = req.body.phoneNumber;
 
-    var oneVoter = new Invite({
+    var oneVoter = new Voter({
         electionId: electionId,
         voterName: voterName,
         voterEmail: voterEmail,
         voterPhoneNumber: voterPhoneNumber
     });
 
+    Election.findById(electionId, (err, election)=>{
+        let subject = election.electionTitle;
+        let date = election.date;
+        let startTime = election.time.startTime,
+            stopTime = election.time.stopTime;
+        const message = {
+            subject: subject,
+            text: `${'You are invited to come the vote for your prefer candidate on .\n\n' +
+            date + 'from ' + startTime + ' to ' + stopTime +
+            ''}\n\n`
+        };
+    });
+
+
     oneVoter.save(function (err, voter) {
         if(err){
-            return res.json({error: true, msg: "An error has occurred , please try again"});
+            return res.send(err);
+            //return res.json({error: true, msg: "An error has occurred , please try again"});
         }
         return res.json(voter);
     });
@@ -237,7 +252,7 @@ exports.sendOneInvite = (req, res)=>{
 exports.editVoter = (req, res)=>{
     let voterId = req.params.voterId;
 
-    findById(voterId, (err, val)=>{
+    Voter.findById(voterId, (err, val)=>{
         if(err){
             return res.json({error: true, msg: "An error has occurred , please try again"});
         }
@@ -260,7 +275,7 @@ exports.editVoter = (req, res)=>{
 exports.delete = (req, res)=>{
     let voterId = req.params.voteId;
 
-    findOneAndRemove(voterId, (err)=>{
+    Voter.findOneAndRemove(voterId, (err)=>{
         if(err){
             return res.json({error: true, msg: "An error has occurred , please try again"});
         }
